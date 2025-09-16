@@ -24,6 +24,12 @@
 4. **Lint & types are authoritative**  
    - All changes must pass ESLint and TypeScript with zero errors. If ESLint and Prettier disagree, ESLint prevails.
 
+5. **Long-running commands are MANUAL (do not run in agent)**
+   - Agents **MUST NOT** run background/long-running processes: `npm run dev`, `vite --watch`, `next dev`,
+     `docker compose up` (daemon mode), E2E headed runs, etc.
+   - Instead, use **build/typecheck** for health checks: `npm run build`, `npx tsc --noEmit`, `npm run lint`.
+   - Steps requiring a live server or browser must be marked **[MANUAL]**: the user runs them locally and provides logs if errors occur.
+
 ---
 
 ## 1) Repository Topology (Authoritative)
@@ -207,7 +213,10 @@ ADMIN_ACCESS_KEY (if admin UI enabled)
 ---
 
 ## 11) Agent Execution Protocol (Step‑by‑Step)
-
+0. **Shell Constraints**
+   - Do not run long-running processes or background services in the agent environment.
+   - If a task requires “start dev server / open browser”, mark it as **[MANUAL]**,
+     and request the user to run locally and share logs/screenshots if errors occur.
 1. **Discovery:** Search for existing entity; gather the canonical file path.  
 2. **Plan:** If new code is truly required, choose the **single** target file path and export name.  
 3. **Generate:** Create exactly one file with one exported entity; include minimal private helpers if needed.  
@@ -254,6 +263,8 @@ export default function ToolCard({ tool }: { tool: { slug: string; name: string;
 - [ ] Env secrets not leaked to client.  
 - [ ] A11y and performance budgets respected.  
 - [ ] Barrel files contain re‑exports only.
+- [ ] No long-running processes (dev server, watchers) were run or introduced in the agent environment.
+- [ ] Steps requiring server/browser are marked **[MANUAL]**, with build/typecheck substitutes provided.
 
 ---
 
