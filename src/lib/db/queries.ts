@@ -1,4 +1,5 @@
 import { supabase } from './client'
+import type { Tool } from './types'
 
 export type SearchParams = {
   q?: string
@@ -9,6 +10,7 @@ export type SearchParams = {
   no_signup?: boolean | null
   tags?: string[] | null
   limit?: number
+  offset?: number
 }
 
 export async function searchTools(params: SearchParams) {
@@ -52,5 +54,28 @@ export async function searchTools(params: SearchParams) {
     const { data, error: queryError } = await query
     if (queryError) throw queryError
     return data
+  }
+}
+
+export async function getAllTools(options: { limit?: number; offset?: number } = {}): Promise<Tool[]> {
+  try {
+    const { limit = 100, offset = 0 } = options;
+    
+    const { data, error } = await supabase
+      .from('tools')
+      .select('*')
+      .order('name', { ascending: true })
+      .range(offset, offset + limit - 1)
+    
+    if (error) {
+      console.error('Error fetching tools:', error)
+      throw new Error(`Failed to fetch tools: ${error.message}`)
+    }
+    
+    return data || []
+  } catch (error) {
+    console.error('Unexpected error in getAllTools:', error)
+    // Return empty array as fallback
+    return []
   }
 }
