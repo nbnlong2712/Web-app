@@ -1,0 +1,1 @@
+// ToolCard component will be defined here

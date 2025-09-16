@@ -1,0 +1,1 @@
+// SearchBox component will be defined here

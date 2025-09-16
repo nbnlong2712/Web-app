@@ -1,0 +1,1 @@
+// ToolDetail component will be defined here
