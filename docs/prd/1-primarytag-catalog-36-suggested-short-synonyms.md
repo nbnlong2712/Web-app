@@ -1,0 +1,39 @@
+# 1) `primary_tag` catalog (36 suggested) + short synonyms
+- **text-to-image** — t2i, image generator
+- **image-editing** — remove bg, inpaint, retouch
+- **image-upscaling** — upscale, super-resolution
+- **image-to-image** — img2img, style transfer
+- **text-to-video** — t2v, video generator
+- **talking-avatar** — talking head, avatar video
+- **video-editing** — auto caption, cut, remove filler
+- **text-to-speech** — TTS, voiceover
+- **speech-to-text** — STT, transcribe
+- **voice-cloning** — clone voice
+- **music-generation** — music ai
+- **sound-effects** — sfx
+- **chatbot** — ai chat
+- **document-qa** — chat with pdf, RAG
+- **summarization** — summarize
+- **translation** — translate
+- **paraphrase** — rewrite, rephrase
+- **coding-assistant** — copilot
+- **code-generation** — generate code
+- **sql-generation** — text-to-sql
+- **data-analysis** — analyze csv
+- **presentation** — slides generator
+- **notetaking** — meeting notes
+- **research** — web research
+- **agent-builder** — AI agents, automation
+- **rag-platform** — vector search, ingestion
+- **model-hosting** — inference API
+- **fine-tuning** — finetune
+- **design-generator** — logo/UI/brand
+- **prompt-library** — prompt marketplace
+- **seo-writing** — blog/SEO
+- **email-assistant** — email writer
+- **ecommerce** — product description
+- **education** — flashcards, quiz
+- **security-privacy** — moderation
+- **nsfw** — adult (hidden by default)
+
+> Keep 24–36 `primary_tag` for coverage vs. maintainability. `nsfw` is special for safety filtering.

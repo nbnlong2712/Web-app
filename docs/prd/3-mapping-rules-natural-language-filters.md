@@ -1,0 +1,12 @@
+# 3) Mapping rules (natural language → filters)
+- **Normalize:** lowercase, strip punctuation; add **diacritics-free** Vietnamese for matching.
+- **Constraints (high priority):**
+  - `free|0đ` → `pricing=free`
+  - `freemium` → `pricing=freemium`
+  - `paid|$|đ` → `pricing=paid`
+  - `no signup` → `no_signup=true`
+  - `api` → `platform=api`; `web` → `platform=web`; `desktop|windows|mac` → `platform=desktop`
+  - `vietnamese|` → include `vi`; `english` → include `en`
+- **Use case → `primary_tag`:** synonym dictionary; if multiple matches, prefer **specific > generic** (e.g., `talking-avatar` over `text-to-video`).
+- **Fallback:** if no `primary_tag`, take **top-3 nearest tags** via FTS+trigram from `name/description/tags` as suggestions.
+- **Sanitization:** drop stop-phrases (“I need”, “please”, “help”).
