@@ -39,3 +39,18 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# --- Playwright artifacts (đừng commit) ---
+playwright-report/
+blob-report/
+test-results/
+
+# Nếu Playwright cài browser binaries trong project
+ms-playwright/
+playwright/.cache/
+.playwright-cache/
+
+# Trace/Video tạm
+*.trace.zip
+*.webm
+*.mp4

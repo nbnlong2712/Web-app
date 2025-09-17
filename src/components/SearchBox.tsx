@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, KeyboardEvent } from 'react'
 import { GlassButton } from '@/components/GlassButton'
 import { motion } from 'framer-motion'
 import { PaperPlaneIcon } from '@radix-ui/react-icons'
+import { trackEvent } from '@/lib/analytics'
 
 interface SearchBoxProps {
   onSearch: (query: string) => void
@@ -16,6 +17,12 @@ export function SearchBox({ onSearch, placeholder = "Describe what you need..." 
 
   const handleSubmit = () => {
     if (query.trim()) {
+      // Track search submit event
+      trackEvent('search_submit', {
+        query_length: query.length,
+        query_preview: query.substring(0, 50), // First 50 characters for context
+      });
+      
       onSearch(query)
     }
   }

@@ -9,6 +9,7 @@ import {
   DialogTitle
 } from '@/components/ui/dialog';
 import { Card } from '@/components/ui/card';
+import { trackEvent } from '@/lib/analytics';
 
 interface ToolDetailProps {
   tool: Tool;
@@ -38,6 +39,13 @@ export default function ToolDetail({ tool, isOpen, onClose }: ToolDetailProps) {
 
   // Handle visit button click
   const handleVisit = () => {
+    // Track visit click event
+    trackEvent('visit_click', {
+      tool_id: tool.id,
+      tool_name: tool.name,
+      tool_slug: tool.slug,
+    });
+    
     // In a real implementation, this would track the click and then redirect
     // For now, we'll just open in a new tab
     window.open(`/go/${tool.slug}`, '_blank');

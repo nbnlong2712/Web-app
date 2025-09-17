@@ -1,3 +1,5 @@
+// app/admin/import/actions.ts
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use server';
 
 import { createClient } from '@supabase/supabase-js';
@@ -132,8 +134,7 @@ export async function importToolsFromCSV(csvData: Partial<Tool>[]) {
       
       if (existingTool) {
         // Update existing tool
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const updateData: any = {
+        const updateData = {
           name: row.name || '',
           slug: row.slug || '',
           description: row.description || null,
@@ -161,8 +162,7 @@ export async function importToolsFromCSV(csvData: Partial<Tool>[]) {
         updatedCount++;
       } else {
         // Insert new tool
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const insertData: any = {
+        const insertData = {
           name: row.name || '',
           slug: row.slug || '',
           description: row.description || null,
@@ -181,7 +181,7 @@ export async function importToolsFromCSV(csvData: Partial<Tool>[]) {
         
         const { error: insertError } = await supabase
           .from('tools')
-          .insert([insertData]);
+          .insert([insertData] as any);
         
         if (insertError) {
           throw new Error(`Failed to insert tool: ${insertError.message}`);

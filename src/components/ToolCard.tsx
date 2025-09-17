@@ -1,9 +1,10 @@
 "use client"
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card"
 import Link from "next/link"
 import ToolDetail from "@/components/ToolDetail"
+import { trackEvent } from '@/lib/analytics';
 
 import type { Tool as DatabaseTool } from '@/lib/db/types';
 
@@ -12,6 +13,15 @@ export type Tool = DatabaseTool;
 
 export default function ToolCard({ tool }: { tool: Tool }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Track tool card view when component mounts
+  useEffect(() => {
+    trackEvent('tool_card_view', {
+      tool_id: tool.id,
+      tool_name: tool.name,
+      tool_slug: tool.slug,
+    });
+  }, [tool.id, tool.name, tool.slug]);
 
   const handleOpenModal = (e: React.MouseEvent) => {
     e.preventDefault();
