@@ -47,8 +47,6 @@ const normalizeTags = (tags: string): string[] => {
     .filter(tag => tag.length > 0);
 };
 
-import type { Tool } from '@/lib/db/types';
-
 type ToolUpdate = {
   name?: string;
   slug?: string;
@@ -70,7 +68,7 @@ type ToolInsert = ToolUpdate & {
 };
 
 // Validate a single tool row
-const validateToolRow = (row: Partial<Tool>, rowIndex: number): string[] => {
+const validateToolRow = (row: any, rowIndex: number): string[] => {
   const errors: string[] = [];
   
   // Check required fields
@@ -92,7 +90,7 @@ const validateToolRow = (row: Partial<Tool>, rowIndex: number): string[] => {
 };
 
 // Process and import tools from CSV data
-export async function importToolsFromCSV(csvData: Partial<Tool>[]) {
+export async function importToolsFromCSV(csvData: any[]) {
   const supabase = getSupabaseClient();
   
   let createdCount = 0;
@@ -134,7 +132,7 @@ export async function importToolsFromCSV(csvData: Partial<Tool>[]) {
       
       if (existingTool) {
         // Update existing tool
-        const updateData = {
+        const updateData: ToolUpdate = {
           name: row.name || '',
           slug: row.slug || '',
           description: row.description || null,
@@ -162,7 +160,7 @@ export async function importToolsFromCSV(csvData: Partial<Tool>[]) {
         updatedCount++;
       } else {
         // Insert new tool
-        const insertData = {
+        const insertData: ToolInsert = {
           name: row.name || '',
           slug: row.slug || '',
           description: row.description || null,
@@ -195,6 +193,22 @@ export async function importToolsFromCSV(csvData: Partial<Tool>[]) {
       } else {
         errors.push({ row: rowIndex, errors: ['Unknown error occurred'] });
       }
+    }
+  }
+  
+  // Trigger revalidation after successful import
+  if (createdCount > 0 || updatedCount > 0) {
+    try {
+      // Revalidate the library page
+      await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/library`, { method: 'GET' });
+      
+      // Revalidate the home page
+      await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}`, { method: 'GET' });
+      
+      console.log('Successfully revalidated pages after import');
+    } catch (revalidateError) {
+      console.error('Error revalidating pages:', revalidateError);
+      // Don't throw error as this shouldn't block the import process
     }
   }
   

@@ -1,7 +1,6 @@
 // app/api/metrics/route.ts
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/db/client';
-// import { Tool } from '@/lib/db/types'; // Not used in this file
 
 // Helper function to get date N days ago
 function getDateNDaysAgo(days: number): string {
@@ -55,10 +54,15 @@ export async function GET(request: Request) {
     // Calculate 7-day and 30-day CTR
     const sevenDaysAgo = getDateNDaysAgo(7);
     
-    const { count: clicks7Day } = await supabase
+    const { count: clicks7Day, error: countError } = await supabase
       .from('clicks')
       .select('*', { count: 'exact', head: true })
       .gte('clicked_at', sevenDaysAgo);
+
+    if (countError) {
+      console.error('Error counting clicks:', countError);
+      return NextResponse.json({ error: 'Failed to count clicks' }, { status: 500 });
+    }
 
     const ctr7Day = totalTools > 0 ? ((clicks7Day || 0) / totalTools) * 100 : 0;
     const ctr30Day = overallCTR;
@@ -90,7 +94,7 @@ export async function GET(request: Request) {
     
     tools.forEach(tool => {
       if (tool.tags) {
-        tool.tags.forEach(tag => {
+        tool.tags.forEach((tag: string) => {
           tagCounts[tag] = (tagCounts[tag] || 0) + (toolClickCounts[tool.id] || 0);
         });
       }

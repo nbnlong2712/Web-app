@@ -13,27 +13,14 @@ export interface EventProperties {
   [key: string]: string | number | boolean | null | undefined;
 }
 
-// Type definitions for window objects
-interface PlausibleWindow extends Window {
-  plausible?: (eventName: string, options?: { props?: EventProperties; u?: string }) => void;
-}
-
-interface GtagParams {
-  [key: string]: string | number | boolean | null | undefined;
-}
-
-interface GtagWindow extends Window {
-  gtag?: (command: string, action: string, params?: GtagParams) => void;
-}
-
 // Type guard for Plausible
-function isPlausibleWindow(window: Window): window is PlausibleWindow {
-  return 'plausible' in window;
+function isPlausibleWindow(window: Window): boolean {
+  return typeof (window as any).plausible !== 'undefined';
 }
 
 // Type guard for Gtag
-function isGtagWindow(window: Window): window is GtagWindow {
-  return 'gtag' in window;
+function isGtagWindow(window: Window): boolean {
+  return typeof (window as any).gtag !== 'undefined';
 }
 
 // Analytics provider interface
@@ -48,8 +35,8 @@ class PlausibleProvider implements AnalyticsProvider {
   private plausible: ((eventName: string, options?: { props?: EventProperties; u?: string }) => void) | undefined;
 
   initialize(): void {
-    if (typeof window !== 'undefined' && isPlausibleWindow(window) && window.plausible) {
-      this.plausible = window.plausible;
+    if (typeof window !== 'undefined' && isPlausibleWindow(window) && (window as any).plausible) {
+      this.plausible = (window as any).plausible;
     }
   }
 
@@ -68,11 +55,11 @@ class PlausibleProvider implements AnalyticsProvider {
 
 // Google Analytics Provider
 class GoogleAnalyticsProvider implements AnalyticsProvider {
-  private gtag: ((command: string, action: string, params?: GtagParams) => void) | undefined;
+  private gtag: ((command: string, action: string, params?: { [key: string]: string | number | boolean | null | undefined }) => void) | undefined;
 
   initialize(): void {
-    if (typeof window !== 'undefined' && isGtagWindow(window) && window.gtag) {
-      this.gtag = window.gtag;
+    if (typeof window !== 'undefined' && isGtagWindow(window) && (window as any).gtag) {
+      this.gtag = (window as any).gtag;
     }
   }
 

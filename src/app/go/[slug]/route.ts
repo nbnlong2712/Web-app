@@ -37,14 +37,14 @@ export async function GET(
     // Insert click data into the clicks table
     const { error: insertError } = await supabase
       .from('clicks')
-      .insert({
+      .insert([{
         tool_id: tool.id,
         referrer,
         utm_source,
         utm_medium,
         utm_campaign,
         ip,
-      });
+      }] as any);
 
     if (insertError) {
       console.error('Error inserting click data:', insertError);

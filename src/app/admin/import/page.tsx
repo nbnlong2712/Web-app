@@ -33,8 +33,6 @@ interface ImportError {
   errors: string[];
 }
 
-
-
 export default function AdminImportPage() {
   const [accessKey, setAccessKey] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -205,7 +203,7 @@ export default function AdminImportPage() {
             // Only add rows with a name
             if (row.name) {
               // Validate the row
-              const rowErrors = validateCSVRow(row, i + 1);
+              const rowErrors = validateCSVRow(row);
               if (rowErrors.length > 0) {
                 errors.push({ row: i + 1, errors: rowErrors });
               } else {
@@ -279,7 +277,7 @@ export default function AdminImportPage() {
       setProgress(50);
       
       // Call the server action to import the data
-      const result = await importToolsFromCSV(csvData);
+      const result = await importToolsFromCSV(csvData as any);
       
       // Update progress
       setProgress(100);

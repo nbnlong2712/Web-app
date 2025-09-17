@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card"
 import Link from "next/link"
+import Image from "next/image"
+import PlaceholderImage from "@/components/PlaceholderImage"
 import ToolDetail from "@/components/ToolDetail"
 import { trackEvent } from '@/lib/analytics';
 
@@ -39,12 +41,9 @@ export default function ToolCard({ tool }: { tool: Tool }) {
         role="article"
         aria-labelledby={`tool-name-${tool.id}`}
       >
-        {/* Thumbnail area (16:9) - placeholder for now */}
-        <div 
-          className="aspect-video bg-gradient-to-br from-primary/20 to-secondary/20 rounded-lg mb-3 flex items-center justify-center"
-          aria-hidden="true"
-        >
-          <span className="text-xs text-muted-foreground">Thumbnail</span>
+        {/* Thumbnail area (16:9) with next/image for optimization */}
+        <div className="aspect-video rounded-lg mb-3 overflow-hidden">
+          <PlaceholderImage />
         </div>
         
         {/* Tool name with proper typography and line clamping */}

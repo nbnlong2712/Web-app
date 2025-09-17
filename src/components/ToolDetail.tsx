@@ -9,6 +9,7 @@ import {
   DialogTitle
 } from '@/components/ui/dialog';
 import { Card } from '@/components/ui/card';
+import PlaceholderImage from '@/components/PlaceholderImage';
 import { trackEvent } from '@/lib/analytics';
 
 interface ToolDetailProps {
@@ -68,12 +69,9 @@ export default function ToolDetail({ tool, isOpen, onClose }: ToolDetailProps) {
         </DialogHeader>
         
         <div className="space-y-6">
-          {/* Thumbnail area (16:9) - placeholder for now */}
-          <div 
-            className="aspect-video bg-gradient-to-br from-primary/20 to-secondary/20 rounded-lg flex items-center justify-center"
-            aria-hidden="true"
-          >
-            <span className="text-sm text-muted-foreground">Tool Thumbnail</span>
+          {/* Thumbnail area (16:9) with next/image for optimization */}
+          <div className="aspect-video rounded-lg overflow-hidden">
+            <PlaceholderImage />
           </div>
           
           {/* Description */}

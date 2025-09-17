@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { Tool } from '@/components/ToolCard';
+import { Tool } from '@/lib/db/types';
 
 // Mock tool data for testing
 const mockTool: Tool = {
@@ -12,6 +12,12 @@ const mockTool: Tool = {
   platform: 'web',
   language: ['en', 'vi'],
   last_updated: '2023-01-01',
+  homepage_url: null,
+  affiliate_url: null,
+  primary_tag: null,
+  no_signup: null,
+  status: null,
+  created_at: null,
 };
 
 test.describe('Tool Detail Modal', () => {

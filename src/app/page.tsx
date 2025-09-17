@@ -81,6 +81,8 @@ export default function Home() {
           className="mt-8 w-full"
           aria-live="polite"
           aria-atomic="true"
+          role="region"
+          aria-label="Search results"
         >
           {isLoading ? (
             <SearchResultsSkeleton />
@@ -97,7 +99,11 @@ export default function Home() {
                 <span className="text-foreground/70">{tools.length} tools</span>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div 
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                role="region"
+                aria-label="Tools grid"
+              >
                 {tools.map((tool) => (
                   <GlassCard 
                     key={tool.id} 

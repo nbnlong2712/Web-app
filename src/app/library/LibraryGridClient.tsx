@@ -41,7 +41,11 @@ export default function LibraryGridClient({ initialTools }: { initialTools: Tool
   // Show initial loading state if no tools and still loading
   if (initialTools.length === 0 && isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div 
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+        role="region"
+        aria-label="Loading tools"
+      >
         {Array.from({ length: 8 }).map((_, index) => (
           <ToolCardSkeleton key={index} />
         ))}
@@ -54,24 +58,15 @@ export default function LibraryGridClient({ initialTools }: { initialTools: Tool
     <>
       {tools.length > 0 ? (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div 
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+            role="region"
+            aria-label="AI tools grid"
+          >
             {tools.map((tool) => (
               <div key={tool.id} data-testid="tool-card">
                 <ToolCard 
-                  tool={{
-                    id: tool.id,
-                    name: tool.name,
-                    slug: tool.slug,
-                    description: tool.description || undefined,
-                    tags: tool.tags || undefined,
-                    pricing: tool.pricing || undefined,
-                    platform: tool.platform || undefined,
-                    language: tool.language || undefined,
-                    no_signup: tool.no_signup || undefined,
-                    status: tool.status || undefined,
-                    last_updated: tool.last_updated || undefined,
-                    created_at: tool.created_at || undefined,
-                  }} 
+                  tool={tool}
                 />
               </div>
             ))}
@@ -83,7 +78,8 @@ export default function LibraryGridClient({ initialTools }: { initialTools: Tool
               <button
                 onClick={loadMore}
                 disabled={isLoading}
-                className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50"
+                className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                aria-label={isLoading ? "Loading more tools" : "Load more tools"}
               >
                 {isLoading ? 'Loading...' : 'Load More'}
               </button>
@@ -92,7 +88,7 @@ export default function LibraryGridClient({ initialTools }: { initialTools: Tool
           
           {/* Show loading indicator when fetching more */}
           {isLoading && hasMore && (
-            <div className="mt-8 text-center">
+            <div className="mt-8 text-center" role="status" aria-label="Loading more tools">
               <div className="inline-block animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-primary"></div>
             </div>
           )}
@@ -108,7 +104,7 @@ export default function LibraryGridClient({ initialTools }: { initialTools: Tool
             <div className="flex flex-col gap-4">
               <p className="text-muted-foreground">
                 Try checking back later or{' '}
-                <a href="/suggest" className="text-primary hover:underline">
+                <a href="/suggest" className="text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded">
                   suggest a tool
                 </a>{' '}
                 you{`'`}d like to see.
