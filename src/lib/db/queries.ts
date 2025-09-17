@@ -79,3 +79,26 @@ export async function getAllTools(options: { limit?: number; offset?: number } =
     return []
   }
 }
+
+export async function getToolBySlug(slug: string): Promise<Tool | null> {
+  try {
+    const { data, error } = await supabase
+      .from('tools')
+      .select('*')
+      .eq('slug', slug)
+      .single()
+    
+    if (error) {
+      if (error.code === 'PGRST116') {
+        // No rows returned
+        return null
+      }
+      throw error
+    }
+    
+    return data || null
+  } catch (error) {
+    console.error('Error fetching tool by slug:', error)
+    throw error
+  }
+}
