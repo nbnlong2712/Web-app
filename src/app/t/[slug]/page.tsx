@@ -1,4 +1,3 @@
-import { Tool } from '@/components/ToolCard';
 import { getToolBySlug } from '@/lib/db/queries';
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -11,11 +10,12 @@ function capitalize(str: string): string {
 
 // Generate metadata for the page
 type Props = {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const tool = await getToolBySlug(params.slug);
+  const { slug } = await params;
+  const tool = await getToolBySlug(slug);
   
   if (!tool) {
     return {
@@ -26,20 +26,34 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   
   const title = `${tool.name} - AI Tools Library`;
   const description = tool.description || `Discover ${tool.name}, a powerful AI tool.`;
+  const url = `https://your-domain.com/t/${slug}`; // Replace with your actual domain
+  const imageUrl = `https://your-domain.com/api/og?title=${encodeURIComponent(tool.name)}`; // Placeholder for dynamic OG image
   
   return {
     title,
     description,
+    alternates: {
+      canonical: url,
+    },
     openGraph: {
       title,
       description,
       type: 'website',
-      url: `https://your-domain.com/t/${params.slug}`, // Replace with your actual domain
+      url,
+      images: [
+        {
+          url: imageUrl,
+          width: 1200,
+          height: 630,
+          alt: `${tool.name} - AI Tools Library`,
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
+      images: [imageUrl],
     },
   };
 }
@@ -47,8 +61,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 // Add ISR revalidation
 export const revalidate = 600; // 10 minutes
 
-export default async function ToolDetailPage({ params }: { params: { slug: string } }) {
-  const tool = await getToolBySlug(params.slug);
+export default async function ToolDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const tool = await getToolBySlug(slug);
   
   // If tool not found, return 404
   if (!tool) {
@@ -64,9 +79,41 @@ export default async function ToolDetailPage({ params }: { params: { slug: strin
       })
     : 'Unknown';
   
+  // Generate breadcrumb JSON-LD
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: 'https://your-domain.com/',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Library',
+        item: 'https://your-domain.com/library',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: tool.name,
+        item: `https://your-domain.com/t/${slug}`,
+      },
+    ],
+  };
+  
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="max-w-4xl mx-auto">
+        {/* JSON-LD for breadcrumb */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+        />
+        
         {/* Back link */}
         <Link 
           href="/library" 

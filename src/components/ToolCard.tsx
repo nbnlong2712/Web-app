@@ -5,20 +5,10 @@ import { Card } from "@/components/ui/card"
 import Link from "next/link"
 import ToolDetail from "@/components/ToolDetail"
 
-export interface Tool {
-  id: string
-  name: string
-  slug: string
-  description?: string
-  tags?: string[]
-  pricing?: 'free' | 'freemium' | 'paid'
-  platform?: 'web' | 'api' | 'desktop'
-  language?: string[]
-  no_signup?: boolean
-  status?: string
-  last_updated?: string
-  created_at?: string
-}
+import type { Tool as DatabaseTool } from '@/lib/db/types';
+
+// Export the Tool type from the database
+export type Tool = DatabaseTool;
 
 export default function ToolCard({ tool }: { tool: Tool }) {
   const [isModalOpen, setIsModalOpen] = useState(false);

@@ -10,7 +10,7 @@ import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from '@/components/ui/table';
 import { importToolsFromCSV, validateAdminAccessKey } from './actions';
-import { parseCSVLine, normalizeHeader, generateSlug, normalizeTags } from './utils';
+import { parseCSVLine, normalizeHeader, generateSlug } from './utils';
 
 // Define types for our CSV data
 interface CSVRow {
@@ -33,11 +33,7 @@ interface ImportError {
   errors: string[];
 }
 
-// Expected CSV headers
-const EXPECTED_HEADERS = [
-  'name', 'slug', 'description', 'homepage_url', 'affiliate_url',
-  'primary_tag', 'tags', 'pricing', 'platform', 'language', 'no_signup', 'status'
-];
+
 
 export default function AdminImportPage() {
   const [accessKey, setAccessKey] = useState('');
@@ -87,7 +83,7 @@ export default function AdminImportPage() {
   };
 
   // Validate a single CSV row
-  const validateCSVRow = (row: CSVRow, rowIndex: number): string[] => {
+  const validateCSVRow = (row: CSVRow): string[] => {
     const errors: string[] = [];
     
     // Check required fields
@@ -256,8 +252,12 @@ export default function AdminImportPage() {
       // Show first 10 rows for preview
       setPreviewData(data.slice(0, 10));
       setShowPreview(true);
-    } catch (error) {
-      setError(`Error parsing CSV: ${error}`);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setError(`Error parsing CSV: ${error.message}`);
+      } else {
+        setError('Error parsing CSV: Unknown error occurred');
+      }
       setIsProcessing(false);
     }
   };
@@ -288,8 +288,12 @@ export default function AdminImportPage() {
       setImportResults(result);
       
       setIsProcessing(false);
-    } catch (error: any) {
-      setError(`Error during import: ${error.message}`);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setError(`Error during import: ${error.message}`);
+      } else {
+        setError('Error during import: Unknown error occurred');
+      }
       setIsProcessing(false);
     }
   };

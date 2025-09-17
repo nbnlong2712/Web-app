@@ -1,14 +1,12 @@
 "use client";
 
-import { useState, useEffect } from 'react';
 import { Tool } from '@/components/ToolCard';
 import { Button } from '@/components/ui/button';
 import { 
   Dialog, 
   DialogContent, 
   DialogHeader, 
-  DialogTitle,
-  DialogTrigger 
+  DialogTitle
 } from '@/components/ui/dialog';
 import { Card } from '@/components/ui/card';
 

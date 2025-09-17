@@ -45,8 +45,30 @@ const normalizeTags = (tags: string): string[] => {
     .filter(tag => tag.length > 0);
 };
 
+import type { Tool } from '@/lib/db/types';
+
+type ToolUpdate = {
+  name?: string;
+  slug?: string;
+  description?: string | null;
+  homepage_url?: string | null;
+  affiliate_url?: string | null;
+  primary_tag?: string | null;
+  tags?: string[] | null;
+  pricing?: 'free' | 'freemium' | 'paid' | null;
+  platform?: 'web' | 'api' | 'desktop' | null;
+  language?: string[] | null;
+  no_signup?: boolean | null;
+  status?: string | null;
+  last_updated?: string;
+};
+
+type ToolInsert = ToolUpdate & {
+  created_at?: string;
+};
+
 // Validate a single tool row
-const validateToolRow = (row: any, rowIndex: number): string[] => {
+const validateToolRow = (row: Partial<Tool>, rowIndex: number): string[] => {
   const errors: string[] = [];
   
   // Check required fields
@@ -68,7 +90,7 @@ const validateToolRow = (row: any, rowIndex: number): string[] => {
 };
 
 // Process and import tools from CSV data
-export async function importToolsFromCSV(csvData: any[]) {
+export async function importToolsFromCSV(csvData: Partial<Tool>[]) {
   const supabase = getSupabaseClient();
   
   let createdCount = 0;
@@ -88,12 +110,12 @@ export async function importToolsFromCSV(csvData: any[]) {
     
     try {
       // Generate slug if missing
-      if (!row.slug) {
+      if (!row.slug && row.name) {
         row.slug = generateSlug(row.name);
       }
       
       // Normalize tags if present
-      if (row.tags) {
+      if (row.tags && typeof row.tags === 'string') {
         row.tags = normalizeTags(row.tags);
       }
       
@@ -101,7 +123,7 @@ export async function importToolsFromCSV(csvData: any[]) {
       const { data: existingTool, error: fetchError } = await supabase
         .from('tools')
         .select('id')
-        .eq('slug', row.slug)
+        .eq('slug', row.slug || '')
         .single();
       
       if (fetchError && fetchError.code !== 'PGRST116') {
@@ -110,12 +132,26 @@ export async function importToolsFromCSV(csvData: any[]) {
       
       if (existingTool) {
         // Update existing tool
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const updateData: any = {
+          name: row.name || '',
+          slug: row.slug || '',
+          description: row.description || null,
+          homepage_url: row.homepage_url || null,
+          affiliate_url: row.affiliate_url || null,
+          primary_tag: row.primary_tag || null,
+          tags: row.tags || null,
+          pricing: row.pricing || null,
+          platform: row.platform || null,
+          language: row.language || null,
+          no_signup: row.no_signup || null,
+          status: row.status || null,
+          last_updated: new Date().toISOString()
+        };
+        
         const { error: updateError } = await supabase
           .from('tools')
-          .update({
-            ...row,
-            last_updated: new Date().toISOString()
-          })
+          .update(updateData)
           .eq('id', existingTool.id);
         
         if (updateError) {
@@ -125,13 +161,27 @@ export async function importToolsFromCSV(csvData: any[]) {
         updatedCount++;
       } else {
         // Insert new tool
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const insertData: any = {
+          name: row.name || '',
+          slug: row.slug || '',
+          description: row.description || null,
+          homepage_url: row.homepage_url || null,
+          affiliate_url: row.affiliate_url || null,
+          primary_tag: row.primary_tag || null,
+          tags: row.tags || null,
+          pricing: row.pricing || null,
+          platform: row.platform || null,
+          language: row.language || null,
+          no_signup: row.no_signup || null,
+          status: row.status || null,
+          last_updated: new Date().toISOString(),
+          created_at: new Date().toISOString()
+        };
+        
         const { error: insertError } = await supabase
           .from('tools')
-          .insert({
-            ...row,
-            last_updated: new Date().toISOString(),
-            created_at: new Date().toISOString()
-          });
+          .insert([insertData]);
         
         if (insertError) {
           throw new Error(`Failed to insert tool: ${insertError.message}`);
@@ -139,8 +189,12 @@ export async function importToolsFromCSV(csvData: any[]) {
         
         createdCount++;
       }
-    } catch (error: any) {
-      errors.push({ row: rowIndex, errors: [error.message] });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        errors.push({ row: rowIndex, errors: [error.message] });
+      } else {
+        errors.push({ row: rowIndex, errors: ['Unknown error occurred'] });
+      }
     }
   }
   
