@@ -11,18 +11,18 @@ test.describe('404 Page', () => {
     // Check that the 404 page content is displayed
     await expect(page.getByText('404 - Page Not Found')).toBeVisible()
     await expect(page.getByText('Sorry, the page you are looking for does not exist.')).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Go Home' })).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Go to Library' })).toBeVisible()
   })
 
-  test('should navigate to home page when "Go Home" button is clicked', async ({ page }) => {
+  test('should navigate to library page when "Go to Library" link is clicked', async ({ page }) => {
     // Navigate to a non-existent page
     await page.goto('/non-existent-page')
     
-    // Click the "Go Home" button
-    await page.getByRole('button', { name: 'Go Home' }).click()
+    // Click the "Go to Library" link
+    await page.getByRole('link', { name: 'Go to Library' }).click()
     
-    // Check that we are on the home page
-    await expect(page).toHaveURL('/')
+    // Check that we are on the library page
+    await expect(page).toHaveURL('/library')
     await expect(page.getByText('AI Tools Library')).toBeVisible()
   })
 })

@@ -1,17 +1,8 @@
-"use client";
-
 import React from "react";
-import { useRouter } from "next/navigation";
 import { GlassCard } from "@/components/GlassCard";
 import { Button } from "@/components/ui/button";
 
 export default function NotFound() {
-  const router = useRouter();
-
-  const handleGoHome = () => {
-    router.push("/library");
-  };
-
   return (
     <div className="min-h-screen flex items-center justify-center p-4"
          style={{ 
@@ -29,10 +20,12 @@ export default function NotFound() {
               The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.
             </p>
             <Button 
-              onClick={handleGoHome}
+              asChild
               className="w-full"
             >
-              Go to Library
+              <a href="/library">
+                Go to Library
+              </a>
             </Button>
           </div>
         </GlassCard>

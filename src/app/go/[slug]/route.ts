@@ -4,14 +4,14 @@ import { supabase } from '@/lib/db/client';
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ slug: string }> }
+  { params }: { params: { slug: string } }
 ) {
   // Validate slug parameter
-  if (!params || !(await params).slug) {
+  if (!params || !params.slug) {
     return new NextResponse('Missing slug parameter', { status: 400 });
   }
 
-  const { slug } = await params;
+  const { slug } = params;
 
   try {
     // Look up tool by slug
