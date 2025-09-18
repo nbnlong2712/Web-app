@@ -23,13 +23,13 @@ describe('NotFound Page', () => {
     // Check that the title and description are rendered
     expect(screen.getByText('404 - Page Not Found')).toBeTruthy()
     expect(screen.getByText('Sorry, the page you are looking for does not exist.')).toBeTruthy()
-    expect(screen.getByRole('button', { name: 'Go Home' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Go to Library' })).toBeTruthy()
     
     // Clean up
     unmount();
   })
 
-  it('should navigate to home page when "Go Home" button is clicked', () => {
+  it('should navigate to library page when "Go to Library" button is clicked', () => {
     // Mock router
     const mockPush = vi.fn()
     vi.mocked(nextNavigation.useRouter).mockReturnValue({
@@ -39,11 +39,11 @@ describe('NotFound Page', () => {
     // Render the component
     const { unmount } = render(<NotFound />)
 
-    // Click the "Go Home" button
-    fireEvent.click(screen.getByRole('button', { name: 'Go Home' }))
+    // Click the "Go to Library" button
+    fireEvent.click(screen.getByRole('button', { name: 'Go to Library' }))
 
-    // Check that router.push was called with '/'
-    expect(mockPush).toHaveBeenCalledWith('/')
+    // Check that router.push was called with '/library'
+    expect(mockPush).toHaveBeenCalledWith('/library')
     
     // Clean up
     unmount();

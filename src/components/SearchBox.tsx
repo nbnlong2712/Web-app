@@ -45,8 +45,9 @@ export function SearchBox({ onSearch, placeholder = "Describe what you need..." 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
+      style={{ height: '160px' }} // Set the height to 160px
     >
-      <div className="flex items-center">
+      <div className="flex items-center h-full">
         <input
           ref={inputRef}
           type="text"
@@ -54,14 +55,16 @@ export function SearchBox({ onSearch, placeholder = "Describe what you need..." 
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
-          className="flex-1 bg-transparent border-0 focus:ring-0 text-foreground placeholder:text-foreground/60 py-4 px-4"
+          className="flex-1 bg-transparent border-0 focus:ring-0 text-foreground placeholder:text-foreground/60 px-4"
           aria-label="Search for AI tools"
+          style={{ height: 'calc(100% - 2rem)', fontSize: '1.25rem' }} // Adjust input height and font size
         />
         <GlassButton 
           onClick={handleSubmit}
           disabled={!query.trim()}
           className="m-1 p-3"
           aria-label="Submit search"
+          style={{ height: '3rem', width: '3rem' }} // Adjust button size
         >
           <PaperPlaneIcon className="w-5 h-5" />
         </GlassButton>
