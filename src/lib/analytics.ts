@@ -14,13 +14,13 @@ export interface EventProperties {
 }
 
 // Type guard for Plausible
-function isPlausibleWindow(window: Window): boolean {
-  return typeof (window as any).plausible !== 'undefined';
+function isPlausibleWindow(window: Window): window is Window & { plausible: (eventName: string, options?: { props?: Record<string, string | number | boolean | null | undefined>; u?: string }) => void } {
+  return typeof (window as unknown as { plausible: unknown }).plausible !== 'undefined';
 }
 
 // Type guard for Gtag
-function isGtagWindow(window: Window): boolean {
-  return typeof (window as any).gtag !== 'undefined';
+function isGtagWindow(window: Window): window is Window & { gtag: (command: string, action: string, params?: Record<string, string | number | boolean | null | undefined>) => void } {
+  return typeof (window as unknown as { gtag: unknown }).gtag !== 'undefined';
 }
 
 // Analytics provider interface
@@ -32,11 +32,11 @@ interface AnalyticsProvider {
 
 // Plausible Analytics Provider
 class PlausibleProvider implements AnalyticsProvider {
-  private plausible: ((eventName: string, options?: { props?: EventProperties; u?: string }) => void) | undefined;
+  private plausible: ((eventName: string, options?: { props?: Record<string, string | number | boolean | null | undefined>; u?: string }) => void) | undefined;
 
   initialize(): void {
-    if (typeof window !== 'undefined' && isPlausibleWindow(window) && (window as any).plausible) {
-      this.plausible = (window as any).plausible;
+    if (typeof window !== 'undefined' && isPlausibleWindow(window)) {
+      this.plausible = window.plausible;
     }
   }
 
@@ -55,11 +55,11 @@ class PlausibleProvider implements AnalyticsProvider {
 
 // Google Analytics Provider
 class GoogleAnalyticsProvider implements AnalyticsProvider {
-  private gtag: ((command: string, action: string, params?: { [key: string]: string | number | boolean | null | undefined }) => void) | undefined;
+  private gtag: ((command: string, action: string, params?: Record<string, string | number | boolean | null | undefined>) => void) | undefined;
 
   initialize(): void {
-    if (typeof window !== 'undefined' && isGtagWindow(window) && (window as any).gtag) {
-      this.gtag = (window as any).gtag;
+    if (typeof window !== 'undefined' && isGtagWindow(window)) {
+      this.gtag = window.gtag;
     }
   }
 

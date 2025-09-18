@@ -1,11 +1,8 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getToolBySlug } from '@/lib/db/queries';
 import { supabase } from '@/lib/db/client';
 
-export async function GET(
-  request: Request,
-  { params }: { params: Promise<{ slug: string }> }
-) {
+export async function GET(req: NextRequest, { params }: { params: { slug: string } }) {
   // Validate slug parameter
   if (!params || !(await params).slug) {
     return new NextResponse('Missing slug parameter', { status: 400 });
@@ -22,9 +19,9 @@ export async function GET(
     }
 
     // Track the visit click event
-    const url = new URL(request.url);
-    const referrer = request.headers.get('referer') || null;
-    // const userAgent = request.headers.get('user-agent') || null; // Not used currently
+    const url = new URL(req.url);
+    const referrer = req.headers.get('referer') || null;
+    // const userAgent = req.headers.get('user-agent') || null; // Not used currently
     
     // Extract UTM parameters
     const utm_source = url.searchParams.get('utm_source') || null;
@@ -32,7 +29,7 @@ export async function GET(
     const utm_campaign = url.searchParams.get('utm_campaign') || null;
     
     // Get client IP (this might need to be adjusted based on your hosting environment)
-    const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || null;
+    const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || null;
 
     // Insert click data into the clicks table
     const { error: insertError } = await supabase
@@ -44,7 +41,7 @@ export async function GET(
         utm_medium,
         utm_campaign,
         ip,
-      }] as any);
+      }]);
 
     if (insertError) {
       console.error('Error inserting click data:', insertError);

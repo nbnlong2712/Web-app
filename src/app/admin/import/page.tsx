@@ -55,7 +55,7 @@ export default function AdminImportPage() {
       } else {
         setError('Invalid access key');
       }
-    } catch (error) {
+            } catch (err: unknown) {
       setError('Authentication error');
     }
   };
@@ -116,7 +116,7 @@ export default function AdminImportPage() {
     try {
       new URL(urlString);
       return true;
-    } catch (error) {
+    } catch (err) {
       return false;
     }
   };
@@ -218,7 +218,7 @@ export default function AdminImportPage() {
           }
           
           resolve(rows);
-        } catch (error) {
+        } catch (err: unknown) {
           reject(error);
         }
       };
@@ -228,13 +228,10 @@ export default function AdminImportPage() {
 
   // Handle file upload and preview
   const handleUploadAndPreview = async () => {
-    if (!file) {
-      setError('Please select a file');
-      return;
-    }
-
-    setIsProcessing(true);
+    if (!file) return;
+    
     setError(null);
+    setIsProcessing(true);
     setProgress(0);
 
     try {
@@ -250,6 +247,7 @@ export default function AdminImportPage() {
       // Show first 10 rows for preview
       setPreviewData(data.slice(0, 10));
       setShowPreview(true);
+      setIsProcessing(false);
     } catch (error: unknown) {
       if (error instanceof Error) {
         setError(`Error parsing CSV: ${error.message}`);
@@ -277,7 +275,7 @@ export default function AdminImportPage() {
       setProgress(50);
       
       // Call the server action to import the data
-      const result = await importToolsFromCSV(csvData as any);
+      const result = await importToolsFromCSV(csvData);
       
       // Update progress
       setProgress(100);

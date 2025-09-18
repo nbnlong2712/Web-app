@@ -3,15 +3,14 @@
 'use server';
 
 import { createClient } from '@supabase/supabase-js';
-import { Database } from '@/lib/db/types';
+// import { Database } from '@/lib/db/types'; // Commented out as the file doesn't exist
 
-// Initialize Supabase client for server-side operations
 const getSupabaseClient = () => {
   if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
     throw new Error('Missing Supabase environment variables');
   }
   
-  return createClient<Database>(
+  return createClient(
     process.env.SUPABASE_URL,
     process.env.SUPABASE_SERVICE_ROLE_KEY
   );
@@ -68,8 +67,8 @@ type ToolInsert = ToolUpdate & {
 };
 
 // Validate a single tool row
-const validateToolRow = (row: any, rowIndex: number): string[] => {
-  const errors: string[] = [];
+const validateToolRow = (row: Record<string, string | boolean | null>): string[] => {
+  const errors: string[] = [] as string[];
   
   // Check required fields
   if (!row.name) {
@@ -77,12 +76,12 @@ const validateToolRow = (row: any, rowIndex: number): string[] => {
   }
   
   // Validate pricing values
-  if (row.pricing && !['free', 'freemium', 'paid'].includes(row.pricing)) {
+  if (row.pricing && typeof row.pricing === 'string' && !['free', 'freemium', 'paid'].includes(row.pricing)) {
     errors.push(`Invalid pricing value: ${row.pricing}. Must be free, freemium, or paid.`);
   }
   
   // Validate platform values
-  if (row.platform && !['web', 'api', 'desktop'].includes(row.platform)) {
+  if (row.platform && typeof row.platform === 'string' && !['web', 'api', 'desktop'].includes(row.platform)) {
     errors.push(`Invalid platform value: ${row.platform}. Must be web, api, or desktop.`);
   }
   
@@ -90,7 +89,7 @@ const validateToolRow = (row: any, rowIndex: number): string[] => {
 };
 
 // Process and import tools from CSV data
-export async function importToolsFromCSV(csvData: any[]) {
+export async function importToolsFromCSV(csvData: Record<string, any>[]) {
   const supabase = getSupabaseClient();
   
   let createdCount = 0;
@@ -98,11 +97,11 @@ export async function importToolsFromCSV(csvData: any[]) {
   const errors: { row: number; errors: string[] }[] = [];
   
   for (let i = 0; i < csvData.length; i++) {
-    const row = csvData[i];
+    const row = csvData[i] as Record<string, string | boolean | null>;
     const rowIndex = i + 2; // +1 for header row, +1 for 0-based index
     
     // Validate the row
-    const rowErrors = validateToolRow(row, rowIndex);
+    const rowErrors = validateToolRow(row);
     if (rowErrors.length > 0) {
       errors.push({ row: rowIndex, errors: rowErrors });
       continue;
@@ -111,12 +110,12 @@ export async function importToolsFromCSV(csvData: any[]) {
     try {
       // Generate slug if missing
       if (!row.slug && row.name) {
-        row.slug = generateSlug(row.name);
+        (row.slug as string) = generateSlug(row.name as string);
       }
       
       // Normalize tags if present
       if (row.tags && typeof row.tags === 'string') {
-        row.tags = normalizeTags(row.tags);
+        (row.tags as string | string[] | null) = normalizeTags(row.tags);
       }
       
       // Check if tool with this slug already exists
@@ -133,18 +132,18 @@ export async function importToolsFromCSV(csvData: any[]) {
       if (existingTool) {
         // Update existing tool
         const updateData: ToolUpdate = {
-          name: row.name || '',
-          slug: row.slug || '',
-          description: row.description || null,
-          homepage_url: row.homepage_url || null,
-          affiliate_url: row.affiliate_url || null,
-          primary_tag: row.primary_tag || null,
-          tags: row.tags || null,
-          pricing: row.pricing || null,
-          platform: row.platform || null,
-          language: row.language || null,
-          no_signup: row.no_signup || null,
-          status: row.status || null,
+          name: row.name ? (row.name as string) : '',
+          slug: row.slug ? (row.slug as string) : '',
+          description: row.description ? (row.description as string) : null,
+          homepage_url: row.homepage_url ? (row.homepage_url as string) : null,
+          affiliate_url: row.affiliate_url ? (row.affiliate_url as string) : null,
+          primary_tag: row.primary_tag ? (row.primary_tag as string) : null,
+          tags: row.tags && Array.isArray(row.tags) ? (row.tags as string[]) : null,
+          pricing: row.pricing ? (row.pricing as 'free' | 'freemium' | 'paid') : null,
+          platform: row.platform ? (row.platform as 'web' | 'api' | 'desktop') : null,
+          language: row.language && Array.isArray(row.language) ? (row.language as string[]) : null,
+          no_signup: row.no_signup ? (row.no_signup as boolean) : null,
+          status: row.status ? (row.status as string) : null,
           last_updated: new Date().toISOString()
         };
         
@@ -161,25 +160,25 @@ export async function importToolsFromCSV(csvData: any[]) {
       } else {
         // Insert new tool
         const insertData: ToolInsert = {
-          name: row.name || '',
-          slug: row.slug || '',
-          description: row.description || null,
-          homepage_url: row.homepage_url || null,
-          affiliate_url: row.affiliate_url || null,
-          primary_tag: row.primary_tag || null,
-          tags: row.tags || null,
-          pricing: row.pricing || null,
-          platform: row.platform || null,
-          language: row.language || null,
-          no_signup: row.no_signup || null,
-          status: row.status || null,
+          name: row.name ? (row.name as string) : '',
+          slug: row.slug ? (row.slug as string) : '',
+          description: row.description ? (row.description as string) : null,
+          homepage_url: row.homepage_url ? (row.homepage_url as string) : null,
+          affiliate_url: row.affiliate_url ? (row.affiliate_url as string) : null,
+          primary_tag: row.primary_tag ? (row.primary_tag as string) : null,
+          tags: row.tags && Array.isArray(row.tags) ? (row.tags as string[]) : null,
+          pricing: row.pricing ? (row.pricing as 'free' | 'freemium' | 'paid') : null,
+          platform: row.platform ? (row.platform as 'web' | 'api' | 'desktop') : null,
+          language: row.language && Array.isArray(row.language) ? (row.language as string[]) : null,
+          no_signup: row.no_signup ? (row.no_signup as boolean) : null,
+          status: row.status ? (row.status as string) : null,
           last_updated: new Date().toISOString(),
           created_at: new Date().toISOString()
         };
         
         const { error: insertError } = await supabase
           .from('tools')
-          .insert([insertData] as any);
+          .insert([insertData]);
         
         if (insertError) {
           throw new Error(`Failed to insert tool: ${insertError.message}`);
