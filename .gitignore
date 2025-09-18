@@ -54,3 +54,5 @@ playwright/.cache/
 *.trace.zip
 *.webm
 *.mp4
+
+mcp.json
